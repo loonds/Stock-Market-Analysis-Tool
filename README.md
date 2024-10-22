@@ -21,7 +21,7 @@ The project is built using **Java 8**, leveraging modern features like the **Str
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/your-repo/stock-market-analysis-tool.git
+git clone https://github.com/loonds/stock-market-analysis-tool.git
 ```
 ### 2. Navigate to the project directory
 ```bash
