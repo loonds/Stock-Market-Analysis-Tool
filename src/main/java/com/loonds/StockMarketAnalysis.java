@@ -8,15 +8,23 @@ import java.util.Scanner;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public class Main {
-    private static List<Stock> stocks = new ArrayList<>();
+public class StockMarketAnalysis {
+    private static final List<Stock> stocks = new ArrayList<>();
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         while (true) {
             System.out.println("\n1. Add Stock Data\n2. List All Stocks\n3. Calculate Moving Average\n4. Find Max Gain\n5. Filter High-Performing Stocks\n6. Exit");
+            System.out.print("Enter your choice: ");
+            // Check if the input is an integer
+            if (!scanner.hasNextInt()) {
+                System.out.println("Invalid input. Please enter a number between 1 and 6.");
+                scanner.next();
+                continue;
+            }
+
             int choice = scanner.nextInt();
-            scanner.nextLine();
+            scanner.nextLine(); // Clear the buffer
 
             switch (choice) {
                 case 1:
@@ -32,54 +40,99 @@ public class Main {
                     findMaxGain();
                     break;
                 case 5:
-                    filterHighPerformingStocks();
+                    filterHighPerformingStocks(scanner);
                     break;
                 case 6:
+                    System.out.println("Exiting the application...");
+                    scanner.close(); // Close the scanner before exit
                     System.exit(0);
+                default:
+                    System.out.println("Invalid choice. Please select a valid option.");
             }
         }
     }
 
     // Method to add stock data
-    private static void addStock(Scanner scanner){
+    private static void addStock(Scanner scanner) {
         System.out.println("Enter stock name:");
         String name = scanner.nextLine();
         System.out.println("Enter stock price:");
-        double price = scanner.nextDouble();
-        System.out.println("Enter stock volume:");
-        int volume = scanner.nextInt();
-        System.out.println("Enter date (yyyy-mm-dd):");
-        LocalDate date = LocalDate.parse(scanner.next());
 
-        Stock stock = new Stock(name,price,volume,date);
+        // Ensure valid double input
+        if (!scanner.hasNextDouble()) {
+            System.out.println("Invalid price. Please enter a valid number.");
+            scanner.next(); // Consume invalid input
+            return;
+        }
+        double price = scanner.nextDouble();
+
+        System.out.println("Enter stock volume:");
+        if (!scanner.hasNextInt()) {
+            System.out.println("Invalid volume. Please enter a valid integer.");
+            scanner.next(); // Consume invalid input
+            return;
+        }
+        int volume = scanner.nextInt();
+
+        System.out.println("Enter date (yyyy-mm-dd):");
+        scanner.nextLine(); // Clear the buffer
+        LocalDate date;
+        try {
+            date = LocalDate.parse(scanner.nextLine());
+        } catch (Exception e) {
+            System.out.println("Invalid date format. Please try again.");
+            return;
+        }
+
+        Stock stock = new Stock(name, price, volume, date);
         stocks.add(stock);
         System.out.println("Stock added successfully!");
     }
 
     // Method to list all stocks
-    private static void listAllStocks(){
-        stocks.forEach(System.out::println);
+    private static void listAllStocks() {
+        if (stocks.isEmpty()) {
+            System.out.println("No stock data available.");
+        } else {
+            stocks.forEach(System.out::println);
+        }
     }
 
     // Method to calculate moving average
-    private static void calculateMovingAverage(Scanner scanner){
+    private static void calculateMovingAverage(Scanner scanner) {
         System.out.println("Enter the stock name:");
         String stockName = scanner.nextLine();
         System.out.println("Enter the number of days for the moving average:");
+
+        if (!scanner.hasNextInt()) {
+            System.out.println("Invalid number of days. Please enter a valid integer.");
+            scanner.next(); // Consume invalid input
+            return;
+        }
         int days = scanner.nextInt();
 
-        List<Stock> collect = stocks.stream()
+        List<Stock> filteredStocks = stocks.stream()
                 .filter(stock -> stock.getName().equalsIgnoreCase(stockName))
                 .sorted((stock1, stock2) -> stock2.getDate().compareTo(stock1.getDate()))
-                .limit(days).collect(Collectors.toList());
+                .limit(days)
+                .collect(Collectors.toList());
 
-        double movingAverage = collect.stream().mapToDouble(Stock::getPrice).average().orElse(0.0);
+        if (filteredStocks.isEmpty()) {
+            System.out.println("No stock data available for the specified stock.");
+            return;
+        }
 
+        double movingAverage = filteredStocks.stream().mapToDouble(Stock::getPrice).average().orElse(0.0);
         System.out.println("The moving average for " + stockName + " over the last " + days + " days is: " + movingAverage);
     }
 
     // Method to find max gain (maximum profit)
     private static void findMaxGain() {
+        if (stocks.isEmpty()) {
+            System.out.println("No stock data available to calculate max gain.");
+            return;
+        }
+
         Optional<Stock> minPriceStock = stocks.stream().min((s1, s2) -> Double.compare(s1.getPrice(), s2.getPrice()));
         Optional<Stock> maxPriceStock = stocks.stream().max((s1, s2) -> Double.compare(s1.getPrice(), s2.getPrice()));
 
@@ -92,16 +145,26 @@ public class Main {
     }
 
     // Method to filter high-performing stocks using dynamic criteria
-    private static void filterHighPerformingStocks() {
+    private static void filterHighPerformingStocks(Scanner scanner) {
         System.out.println("Enter minimum price to filter high-performing stocks:");
-        double minPrice = new Scanner(System.in).nextDouble();
+
+        if (!scanner.hasNextDouble()) {
+            System.out.println("Invalid price. Please enter a valid number.");
+            scanner.next(); // Consume invalid input
+            return;
+        }
+        double minPrice = scanner.nextDouble();
 
         Predicate<Stock> highPerformingCriteria = stock -> stock.getPrice() > minPrice;
         List<Stock> highPerformingStocks = stocks.stream()
                 .filter(highPerformingCriteria)
                 .collect(Collectors.toList());
 
-        System.out.println("High-performing stocks:");
-        highPerformingStocks.forEach(System.out::println);
+        if (highPerformingStocks.isEmpty()) {
+            System.out.println("No high-performing stocks found.");
+        } else {
+            System.out.println("High-performing stocks:");
+            highPerformingStocks.forEach(System.out::println);
+        }
     }
 }
