@@ -36,8 +36,4 @@ cd stock-market-analysis-tool
 ./gradlew run
 ```
 
-### License
-This project is licensed under the MIT License. See the [LICENSE]() file for more details.
-
-
 This `README.md` file provides a concise project overview, instructions on how to set it up and run it, and details on the Java 8 features you're using in the project.
