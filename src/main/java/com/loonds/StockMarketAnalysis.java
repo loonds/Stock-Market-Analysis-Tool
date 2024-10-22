@@ -1,12 +1,8 @@
 package com.loonds;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Scanner;
+import java.util.*;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 public class StockMarketAnalysis {
     private static final List<Stock> stocks = new ArrayList<>();
@@ -115,7 +111,7 @@ public class StockMarketAnalysis {
                 .filter(stock -> stock.getName().equalsIgnoreCase(stockName))
                 .sorted((stock1, stock2) -> stock2.getDate().compareTo(stock1.getDate()))
                 .limit(days)
-                .collect(Collectors.toList());
+                .toList();
 
         if (filteredStocks.isEmpty()) {
             System.out.println("No stock data available for the specified stock.");
@@ -133,10 +129,11 @@ public class StockMarketAnalysis {
             return;
         }
 
-        Optional<Stock> minPriceStock = stocks.stream().min((s1, s2) -> Double.compare(s1.getPrice(), s2.getPrice()));
-        Optional<Stock> maxPriceStock = stocks.stream().max((s1, s2) -> Double.compare(s1.getPrice(), s2.getPrice()));
+        Optional<Stock> minPriceStock = stocks.stream().min(Comparator.comparingDouble(Stock::getPrice));
+        Optional<Stock> maxPriceStock = stocks.stream().max(Comparator.comparingDouble(Stock::getPrice));
 
-        if (minPriceStock.isPresent() && maxPriceStock.isPresent()) {
+
+        if (maxPriceStock.isPresent()) {
             double maxGain = maxPriceStock.get().getPrice() - minPriceStock.get().getPrice();
             System.out.println("The maximum gain is: " + maxGain);
         } else {
@@ -158,7 +155,7 @@ public class StockMarketAnalysis {
         Predicate<Stock> highPerformingCriteria = stock -> stock.getPrice() > minPrice;
         List<Stock> highPerformingStocks = stocks.stream()
                 .filter(highPerformingCriteria)
-                .collect(Collectors.toList());
+                .toList();
 
         if (highPerformingStocks.isEmpty()) {
             System.out.println("No high-performing stocks found.");
