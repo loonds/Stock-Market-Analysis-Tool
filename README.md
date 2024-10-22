@@ -21,7 +21,7 @@ The project is built using **Java 8**, leveraging modern features like the **Str
 
 ### 1. Clone the repository
 ```bash
-git clone https://github.com/your-repo/stock-market-analysis-tool.git
+git clone https://github.com/loonds/stock-market-analysis-tool.git
 ```
 ### 2. Navigate to the project directory
 ```bash
@@ -35,9 +35,5 @@ cd stock-market-analysis-tool
 ```bash
 ./gradlew run
 ```
-
-### License
-This project is licensed under the MIT License. See the [LICENSE]() file for more details.
-
 
 This `README.md` file provides a concise project overview, instructions on how to set it up and run it, and details on the Java 8 features you're using in the project.
